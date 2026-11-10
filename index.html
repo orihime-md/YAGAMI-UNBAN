@@ -1,0 +1,227 @@
+l<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>YAGAMI UNBAN</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: url('bg.jpg') no-repeat center center fixed;
+            background-size: cover;
+            padding: 15px;
+            background-color: #050000;
+        }
+
+        .glass-panel {
+            background: rgba(15, 0, 0, 0.75);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 2px solid rgba(255, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 35px 25px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 5px;
+            letter-spacing: 3px;
+            color: #ff003c;
+            text-shadow: 0 0 10px rgba(255, 0, 60, 0.6);
+        }
+
+        p.subtitle {
+            font-size: 0.8rem;
+            margin-bottom: 35px;
+            color: #ff4d4d;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+            color: #ff3333;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 16px;
+            background: rgba(20, 0, 0, 0.6);
+            border: 1px solid #ff0000;
+            border-radius: 6px;
+            font-size: 1.1rem;
+            color: #ff4d4d;
+            font-weight: bold;
+            outline: none;
+            text-align: center;
+        }
+
+        input[type="text"]:focus {
+            border-color: #ff3333;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.4);
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            background: rgba(255, 0, 0, 0.15);
+            border: 2px solid #ff0000;
+            border-radius: 6px;
+            color: #ffffff;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            text-shadow: 0 0 5px #ff0000;
+        }
+
+        button:disabled {
+            background: rgba(40, 0, 0, 0.2);
+            border-color: #550000;
+            color: #770000;
+            cursor: not-allowed;
+        }
+
+        .terminal-log {
+            margin-top: 25px;
+            background: rgba(10, 0, 0, 0.9);
+            border: 1px dashed rgba(255, 0, 0, 0.4);
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            text-align: left;
+            max-height: 120px;
+            overflow-y: auto;
+            display: none;
+            color: #ff3333;
+        }
+
+        .status-message {
+            margin-top: 20px;
+            font-size: 0.85rem;
+            border-radius: 4px;
+            padding: 12px;
+            font-weight: bold;
+            display: none;
+            text-transform: uppercase;
+            line-height: 1.4;
+            letter-spacing: 0.5px;
+        }
+
+        .status-success { display: block; border: 1px solid #ff003c; color: #ff3333; background: rgba(255, 0, 0, 0.05); text-shadow: 0 0 5px rgba(255, 0, 0, 0.3); }
+        .status-error { display: block; border: 1px solid #aa0000; color: #ff4d4d; background: rgba(50, 0, 0, 0.4); }
+    </style>
+</head>
+<body>
+
+    <div class="glass-panel">
+        <h1>YAGAMI UNBAN</h1>
+        <p class="subtitle">Official Support Routing Node</p>
+        
+        <div class="form-group">
+            <label for="phone">ENTER TARGET NUMBER</label>
+            <input type="text" id="phone" placeholder="+2348000000000">
+        </div>
+
+        <button id="submitBtn" onclick="runUnbanProtocol()">RUN UNBAN</button>
+        
+        <div id="terminalLog" class="terminal-log"></div>
+        <div id="statusBox" class="status-message"></div>
+    </div>
+
+    <script>
+        const terminal = document.getElementById('terminalLog');
+
+        function appendLog(text) {
+            const line = document.createElement('div');
+            line.textContent = `> ${text}`;
+            terminal.appendChild(line);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        async function runUnbanProtocol() {
+            const phoneInput = document.getElementById('phone');
+            const submitBtn = document.getElementById('submitBtn');
+            const statusBox = document.getElementById('statusBox');
+            const targetNumber = phoneInput.value.trim();
+
+            if (!targetNumber) {
+                statusBox.textContent = "CRITICAL ERROR: CHANNELS EMPTY.";
+                statusBox.className = "status-message status-error";
+                return;
+            }
+
+            submitBtn.disabled = true;
+            statusBox.style.display = "none";
+            terminal.style.display = "block";
+            terminal.innerHTML = "";
+
+            appendLog("NORMALIZING STRING DESCRIPTORS...");
+            
+            // Basic layout formatting check prior to firing payload
+            const testClean = targetNumber.replace(/[\s\-\(\)\.]/g, '');
+            if (!/^\+?[1-9]\d{5,14}$/.test(testClean)) {
+                appendLog("FORMAT CRITERIA VIOLATION. ABORTING.");
+                statusBox.textContent = "UNBAN SCRIPT FAILED: USE INTERNATIONAL LAYOUT (+CC...)";
+                statusBox.className = "status-message status-error";
+                submitBtn.disabled = false;
+                return;
+            }
+
+            appendLog("CONNECTING TO HTTPS API ENDPOINTS...");
+            await new Promise(r => setTimeout(r, 400));
+            appendLog("ESTABLISHING ENVELOPE SEED DATA...");
+
+            try {
+                const response = await fetch('/api/appeal', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phoneNumber: targetNumber })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    appendLog("TRANSMISSION VECTOR CLEARED VIA BREVO API INTERFACE.");
+                    statusBox.innerHTML = "UNBAN SCRIPT FIRED SUCCESSFULLY.<br>PLEASE NOTE: THIS IS A 50/50 CHANCE.";
+                    statusBox.className = "status-message status-success";
+                    phoneInput.value = "";
+                } else {
+                    appendLog("API CORE ENGINE REJECTED TRANSACTION DATA ENTRIES.");
+                    statusBox.textContent = "UNBAN SCRIPT FAILED";
+                    statusBox.className = "status-message status-error";
+                }
+            } catch (err) {
+                appendLog("CRITICAL ROUTE FAULT: CHANNEL DISCONNECTED.");
+                statusBox.textContent = "UNBAN SCRIPT FAILED";
+                statusBox.className = "status-message status-error";
+            } finally {
+                submitBtn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
